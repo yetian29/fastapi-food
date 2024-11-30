@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from sqlalchemy import select
 
@@ -20,7 +21,7 @@ class ICustomerRepository(ABC):
         pass
 
 
-@Database(frozen=True)
+@dataclass(frozen=True)
 class PostgresCustomerRepository(ICustomerRepository):
     database: Database
 

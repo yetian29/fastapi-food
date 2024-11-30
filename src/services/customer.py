@@ -13,7 +13,7 @@ from src.domain.customer.services import (
     IPasswordService,
 )
 from src.helper.errors import fail
-from src.infrastructure.postgresql.repisitories.customer import ICustomerRepository
+from src.infrastructure.postgresql.repositories.customer import ICustomerRepository
 
 pwd_context = CryptContext(schemes="bcrypt")
 SECRET_KEY = settings.api.secret_key
