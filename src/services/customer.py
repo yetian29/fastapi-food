@@ -55,3 +55,9 @@ class CustomerService(ICustomerService):
 
     async def get_by_username(self, username: str) -> Customer:
         pass
+
+    async def get_or_create(self, customer: Customer) -> Customer:
+        pass
+
+    async def update(self, customer: Customer) -> Customer:
+        pass

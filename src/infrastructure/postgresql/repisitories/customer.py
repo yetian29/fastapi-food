@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy import select
+
 from src.infrastructure.postgresql.database import Database
 from src.infrastructure.postgresql.models.customer import CustomerORM
 
 
 class ICustomerRepository(ABC):
     @abstractmethod
-    async def get_by_user_name(self, username: str) -> CustomerORM:
+    async def get_by_username(self, username: str) -> CustomerORM:
         pass
 
     @abstractmethod
-    async def get_or_create(self, customer_orm: CustomerORM) -> CustomerORM:
+    async def create(self, customer_orm: CustomerORM) -> CustomerORM:
         pass
 
     @abstractmethod
@@ -22,5 +24,8 @@ class ICustomerRepository(ABC):
 class PostgresCustomerRepository(ICustomerRepository):
     database: Database
 
-    async def get_by_user_name(self, username: str) -> CustomerORM:
-        pass
+    async def get_by_username(self, username: str) -> CustomerORM | None:
+        stmt = select(CustomerORM).where(CustomerORM.username == username).limit(1)
+        async with self.database.get_read_only_session() as session:
+            customer_orm = await session.scalar(stmt)
+            return customer_orm
