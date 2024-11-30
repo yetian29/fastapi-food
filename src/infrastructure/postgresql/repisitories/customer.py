@@ -27,5 +27,6 @@ class PostgresCustomerRepository(ICustomerRepository):
     async def get_by_username(self, username: str) -> CustomerORM | None:
         stmt = select(CustomerORM).where(CustomerORM.username == username).limit(1)
         async with self.database.get_read_only_session() as session:
+            """scalar is used to take single object"""
             customer_orm = await session.scalar(stmt)
             return customer_orm
