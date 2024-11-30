@@ -34,6 +34,7 @@ class Database:
             await session.commit()
             await session.close()
 
+    @asynccontextmanager
     async def get_read_only_session(self) -> AsyncGenerator[AsyncSession]:
         session: AsyncSession = self._read_only_async_session
         try:
