@@ -13,6 +13,7 @@ from src.domain.customer.services import (
     IPasswordService,
 )
 from src.helper.errors import fail
+from src.infrastructure.postgresql.repisitories.customer import ICustomerRepository
 
 pwd_context = CryptContext(schemes="bcrypt")
 SECRET_KEY = settings.api.secret_key
@@ -45,8 +46,12 @@ class LoginCustomerService(ILoginCustomerService):
     def generate_token_and_active(self, customer: Customer) -> str:
         customer.token = jwt.encode(customer.oid, SECRET_KEY, algorithm=ALGORITHM)
         customer.is_active = True
+        return customer.token
 
 
+@dataclass(frozen=True)
 class CustomerService(ICustomerService):
+    repository: ICustomerRepository
+
     async def get_by_username(self, username: str) -> Customer:
         pass
