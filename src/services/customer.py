@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 
 from src.core import settings
 from src.domain.customer.entities import Customer
-from src.domain.customer.errors import CredentailException
+from src.domain.customer.errors import CredentailException, CustomerIsNotFoundException
 from src.domain.customer.services import (
     IAuthenticateCustomerService,
     ICustomerService,
@@ -54,7 +54,10 @@ class CustomerService(ICustomerService):
     repository: ICustomerRepository
 
     async def get_by_username(self, username: str) -> Customer:
-        pass
+        customer_orm = await self.repository.get_by_username(username)
+        if not customer_orm:
+            fail(CustomerIsNotFoundException)
+        return customer_orm.to_entity()
 
     async def get_or_create(self, customer: Customer) -> Customer:
         pass
