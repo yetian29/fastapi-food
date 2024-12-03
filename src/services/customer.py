@@ -78,13 +78,16 @@ class TokenService(ITokenService):
 
     def is_token_valid(self, token: str) -> bool:
         try:
-            jwt.decode(token, self._secret_key, algorithms=self._algorithm)
+            payload = jwt.decode(token, self._secret_key, algorithms=self._algorithm)
         except jwt.ExpiredSignatureError:
             fail(TokenExpiredException("Token has expired"))
         except jwt.JWTError:
             return False
         else:
-            if token in self.revoke_token:
+            if payload.get("type") not in ["access", "refresh"]:
+                return False
+
+            elif token in self.revoke_token:
                 return False
             return True
 
