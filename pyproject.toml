@@ -12,6 +12,7 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 alembic = "^1.14.0"
 pydantic-settings = "^2.6.1"
+punq = "^0.7.0"
 
 
 [tool.poetry.group.dev.dependencies]

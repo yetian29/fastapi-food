@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -13,18 +14,20 @@ from src.domain.customer.services import (
     IPasswordService,
 )
 from src.helper.errors import fail
+from src.infrastructure.postgresql.models.customer import CustomerORM
 from src.infrastructure.postgresql.repositories.customer import ICustomerRepository
 
 pwd_context = CryptContext(schemes="bcrypt")
 SECRET_KEY = settings.api.secret_key
 ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 
 class PasswordService(IPasswordService):
     def get_hased_password(self, plain_password: str) -> str:
         return pwd_context.hash(plain_password)
 
-    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+    def verify_password(self, plain_password: str, hashed_password: str) -> True:
         verified = pwd_context.verify(plain_password, hashed_password)
         return True if verified else fail(CredentailException)
 
@@ -44,7 +47,9 @@ class AuthenticateCustomerService(IAuthenticateCustomerService):
 
 class LoginCustomerService(ILoginCustomerService):
     def generate_token_and_active(self, customer: Customer) -> str:
-        customer.token = jwt.encode(customer.oid, SECRET_KEY, algorithm=ALGORITHM)
+        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        data = {"oid": customer.oid, "exp": expire}
+        customer.token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
         customer.is_active = True
         return customer.token
 
@@ -54,13 +59,20 @@ class CustomerService(ICustomerService):
     repository: ICustomerRepository
 
     async def get_by_username(self, username: str) -> Customer:
-        customer_orm = await self.repository.get_by_username(username)
-        if not customer_orm:
+        dto = await self.repository.get_by_username(username)
+        if not dto:
             fail(CustomerIsNotFoundException)
-        return customer_orm.to_entity()
+        return dto.to_entity()
 
     async def get_or_create(self, customer: Customer) -> Customer:
-        pass
+        try:
+            customer = await self.get_by_username(username=customer.username)
+        except CustomerIsNotFoundException:
+            dto = CustomerORM.from_entity(customer)
+            dto = await self.repository.create(dto)
+        return dto.to_entity()
 
     async def update(self, customer: Customer) -> Customer:
-        pass
+        dto = CustomerORM.from_entity(customer)
+        dto = await self.repository.update(dto)
+        return dto.to_entity()

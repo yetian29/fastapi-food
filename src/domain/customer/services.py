@@ -9,7 +9,7 @@ class IPasswordService:
         pass
 
     @abstractmethod
-    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+    def verify_password(self, plain_password: str, hashed_password: str) -> True:
         pass
 
 
