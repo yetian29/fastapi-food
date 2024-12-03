@@ -10,7 +10,7 @@ class IPasswordService:
         pass
 
     @abstractmethod
-    def get_hased_password(self, password: str) -> str:
+    def get_hahsed_password(self, password: str) -> str:
         pass
 
     @abstractmethod
@@ -31,10 +31,19 @@ class ITokenService:
     def revoke_token(self, token: str):
         pass
 
-
-class IAuthenticateCustomerService:
     @abstractmethod
-    async def authenticate(self, username: str, password: str) -> True:
+    def is_token_valid(self, token: str) -> bool:
+        pass
+
+
+class ICustomerLoginService:
+    @abstractmethod
+    async def authenticate(self, username: str, password: str) -> Customer:
+        pass
+
+    def generate_access_token_and_refresh_token_and_is_active(
+        self, customer: Customer
+    ) -> tuple[str, str]:
         pass
 
 
@@ -50,7 +59,7 @@ class ICustomerService:
         pass
 
     @abstractmethod
-    async def get_or_create(self, customer: Customer) -> Customer:
+    async def create(self, customer: Customer) -> Customer:
         pass
 
     @abstractmethod

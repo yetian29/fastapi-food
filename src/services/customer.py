@@ -9,9 +9,10 @@ from src.domain.customer.entities import Customer
 from src.domain.customer.errors import (
     CustomerIsNotFoundException,
     InvalidCredentialException,
+    TokenExpiredException,
 )
 from src.domain.customer.services import (
-    IAuthenticateCustomerService,
+    ICustomerLoginService,
     ICustomerService,
     IPasswordService,
     ITokenService,
@@ -28,11 +29,15 @@ class PasswordService(IPasswordService):
     _pwd_context: CryptContext = CryptContext(schemes="bcrypt")
 
     def validate_password_strength(self, password: str) -> bool:
-        if not self._min_password_strength <= password <= self._max_password_strength:
+        if (
+            not self._min_password_strength
+            <= len(password)
+            <= self._max_password_strength
+        ):
             return False
         return True
 
-    def get_hased_password(self, plain_password: str) -> str:
+    def get_hashed_password(self, plain_password: str) -> str:
         if not self.validate_password_strength(plain_password):
             fail(
                 InvalidCredentialException(
@@ -46,7 +51,7 @@ class PasswordService(IPasswordService):
         return (
             True
             if verified
-            else fail(InvalidCredentialException("Password isn't exactly"))
+            else fail(InvalidCredentialException("Password is incorrect"))
         )
 
 
@@ -71,6 +76,18 @@ class TokenService(ITokenService):
     def revoke_token(self, token: str):
         self._revoke_token[token] = datetime.now()
 
+    def is_token_valid(self, token: str) -> bool:
+        try:
+            jwt.decode(token, self._secret_key, algorithms=self._algorithm)
+        except jwt.ExpiredSignatureError:
+            fail(TokenExpiredException("Token has expired"))
+        except jwt.JWTError:
+            return False
+        else:
+            if token in self.revoke_token:
+                return False
+            return True
+
 
 @dataclass(frozen=True)
 class CustomerService(ICustomerService):
@@ -82,12 +99,9 @@ class CustomerService(ICustomerService):
             fail(CustomerIsNotFoundException)
         return dto.to_entity()
 
-    async def get_or_create(self, customer: Customer) -> Customer:
-        try:
-            customer = await self.get_by_username(username=customer.username)
-        except CustomerIsNotFoundException:
-            dto = CustomerORM.from_entity(customer)
-            dto = await self.repository.create(dto)
+    async def create(self, customer: Customer) -> Customer:
+        dto = CustomerORM.from_entity(customer)
+        dto = await self.repository.create(dto)
         return dto.to_entity()
 
     async def update(self, customer: Customer) -> Customer:
@@ -97,13 +111,24 @@ class CustomerService(ICustomerService):
 
 
 @dataclass(frozen=True)
-class AuthenticateCustomerService(IAuthenticateCustomerService):
+class CustomerLoginService(ICustomerLoginService):
     customer_service: ICustomerService
     password_service: IPasswordService
+    token_service: ITokenService
 
-    async def authenticate(self, username: str, password: str) -> True:
+    async def authenticate(self, username: str, password: str) -> Customer:
         customer = await self.customer_service.get_by_username(username)
-        if customer:
-            return self.password_service.verify_password(password, customer.password)
-        else:
-            fail(InvalidCredentialException("Customer isn't exist"))
+        self.password_service.verify_password(password, customer.password)
+        return customer
+
+    def generate_access_token_and_refresh_token_and_is_active(
+        self, customer: Customer
+    ) -> tuple[str, str]:
+        access_token = self.token_service.generate_access_token(
+            customer_oid=customer.oid
+        )
+        refresh_token = self.token_service.generate_refresh_token(
+            customer_oid=customer.oid
+        )
+        customer.is_active = True
+        return access_token, refresh_token

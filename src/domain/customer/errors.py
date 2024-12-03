@@ -9,5 +9,9 @@ class InvalidCredentialException(BaseCustomerException):
     pass
 
 
+class TokenExpiredException(BaseCustomerException):
+    pass
+
+
 class CustomerIsNotFoundException(BaseCustomerException):
     pass
