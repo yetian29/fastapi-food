@@ -1,9 +1,13 @@
 from src.domain.base.errors import BaseDomainException
 
 
-class CredentailException(BaseDomainException):
+class BaseCustomerException(BaseDomainException):
     pass
 
 
-class CustomerIsNotFoundException(BaseDomainException):
+class InvalidCredentialException(BaseCustomerException):
+    pass
+
+
+class CustomerIsNotFoundException(BaseCustomerException):
     pass
