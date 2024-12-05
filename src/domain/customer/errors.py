@@ -13,5 +13,17 @@ class TokenExpiredException(BaseCustomerException):
     pass
 
 
+class JWTException(BaseCustomerException):
+    pass
+
+
+class TokenTypeInvalidException(BaseCustomerException):
+    pass
+
+
+class TokenInvalidException(BaseCustomerException):
+    pass
+
+
 class CustomerIsNotFoundException(BaseCustomerException):
     pass

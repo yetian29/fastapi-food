@@ -15,7 +15,8 @@ class CustomerORM(Base):
     )
     username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    token: Mapped[str] = mapped_column(default="", unique=True)
+    access_token: Mapped[str] = mapped_column(default="", unique=True)
+    refresh_token: Mapped[str] = mapped_column(default="", unique=True)
     is_active: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(
         default=func.now(), server_default=func.now()
@@ -39,7 +40,8 @@ class CustomerORM(Base):
             oid=self.oid,
             username=self.username,
             password=self.password,
-            token=self.token,
+            access_token=self.access_token,
+            refresh_token=self.refresh_tokne,
             is_active=self.is_active,
             created_at=self.created_at,
             updated_at=self.updated_at,

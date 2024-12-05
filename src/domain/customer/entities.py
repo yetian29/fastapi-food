@@ -8,7 +8,8 @@ class Customer:
     oid: UUID
     username: str
     password: str
-    token: str = ""
+    access_token: str = ""
+    refresh_token: str = ""
     is_active: bool = False
     created_at: datetime
     updated_at: datetime

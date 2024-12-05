@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from uuid import UUID
 
@@ -9,7 +9,10 @@ from src.domain.customer.entities import Customer
 from src.domain.customer.errors import (
     CustomerIsNotFoundException,
     InvalidCredentialException,
+    JWTException,
     TokenExpiredException,
+    TokenInvalidException,
+    TokenTypeInvalidException,
 )
 from src.domain.customer.services import (
     ICustomerLoginService,
@@ -61,7 +64,9 @@ class TokenService(ITokenService):
     _access_token_expire_minutes: int = 15
     _refresh_token_expire_days: int = 7
     _algorithm: str = "HS256"
-    _revoke_token: dict[str, datetime] = {}
+    _revoke_token: set[str] = field(default_factory=set)
+
+    customer_service: ICustomerService
 
     def generate_access_token(self, customer_oid: UUID) -> str:
         expire = datetime.now() + timedelta(minutes=self._access_token_expire_minutes)
@@ -74,22 +79,38 @@ class TokenService(ITokenService):
         return jwt.encode(payload, self._secret_key, algorithm=self._algorithm)
 
     def revoke_token(self, token: str):
-        self._revoke_token[token] = datetime.now()
+        self._revoke_token.add(token)
 
-    def is_token_valid(self, token: str) -> bool:
+    def is_token_valid(self, token: str) -> dict:
         try:
             payload = jwt.decode(token, self._secret_key, algorithms=self._algorithm)
         except jwt.ExpiredSignatureError:
             fail(TokenExpiredException("Token has expired"))
         except jwt.JWTError:
-            return False
+            fail(JWTException)
         else:
             if payload.get("type") not in ["access", "refresh"]:
-                return False
+                fail(TokenTypeInvalidException)
 
             elif token in self.revoke_token:
-                return False
-            return True
+                fail(TokenInvalidException)
+            return payload
+
+    async def refresh_access_token(self, refresh_token: str) -> str:
+        payload = self.is_token_valid(refresh_token)
+        customer_oid = UUID(payload.get("sub"))
+        customer = await self.customer_service.get_by_oid(oid=customer_oid)
+        self.revoke_token(customer.access_token)
+        new_access_token = self.generate_access_token(customer.oid)
+        return new_access_token
+
+    async def refresh_refresh_token(self, refresh_token: str) -> str:
+        payload = self.is_token_valid(refresh_token)
+        customer_oid = UUID(payload.get("sub"))
+        customer = await self.customer_service.get_by_oid(oid=customer_oid)
+        self.revoke_token(customer.refresh_token)
+        new_refresh_token = self.generate_refresh_token(customer.oid)
+        return new_refresh_token
 
 
 @dataclass(frozen=True)
@@ -98,6 +119,12 @@ class CustomerService(ICustomerService):
 
     async def get_by_username(self, username: str) -> Customer:
         dto = await self.repository.get_by_username(username)
+        if not dto:
+            fail(CustomerIsNotFoundException)
+        return dto.to_entity()
+
+    async def get_by_oid(self, oid: UUID) -> Customer:
+        dto = await self.repository.get_by_oid(oid)
         if not dto:
             fail(CustomerIsNotFoundException)
         return dto.to_entity()

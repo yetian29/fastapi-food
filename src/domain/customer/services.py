@@ -32,7 +32,15 @@ class ITokenService:
         pass
 
     @abstractmethod
-    def is_token_valid(self, token: str) -> bool:
+    def is_token_valid(self, token: str) -> True:
+        pass
+
+    @abstractmethod
+    async def refresh_access_token(self, refresh_token: str) -> str:
+        pass
+
+    @abstractmethod
+    async def refresh_refresh_token(self, refresh_token: str) -> str:
         pass
 
 
@@ -56,6 +64,10 @@ class ILoginCustomerService:
 class ICustomerService:
     @abstractmethod
     async def get_by_username(self, username: str) -> Customer:
+        pass
+
+    @abstractmethod
+    async def get_by_oid(self, oid: UUID) -> Customer:
         pass
 
     @abstractmethod

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from uuid import UUID
 
 from sqlalchemy import select
 
@@ -10,6 +11,10 @@ from src.infrastructure.postgresql.models.customer import CustomerORM
 class ICustomerRepository(ABC):
     @abstractmethod
     async def get_by_username(self, username: str) -> CustomerORM | None:
+        pass
+
+    @abstractmethod
+    async def get_by_oid(self, oid: UUID) -> CustomerORM | None:
         pass
 
     @abstractmethod
@@ -27,6 +32,13 @@ class PostgresCustomerRepository(ICustomerRepository):
 
     async def get_by_username(self, username: str) -> CustomerORM | None:
         stmt = select(CustomerORM).where(CustomerORM.username == username).limit(1)
+        async with self.database.get_read_only_session() as session:
+            """scalar is used to take single object"""
+            dto = await session.scalar(stmt)
+            return dto
+
+    async def get_by_oid(self, oid: UUID) -> CustomerORM | None:
+        stmt = select(CustomerORM).where(CustomerORM.oid == oid).limit(1)
         async with self.database.get_read_only_session() as session:
             """scalar is used to take single object"""
             dto = await session.scalar(stmt)
