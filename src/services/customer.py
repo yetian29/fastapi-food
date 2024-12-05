@@ -5,6 +5,7 @@ from uuid import UUID
 from jose import jwt
 from passlib.context import CryptContext
 
+from src.core.settings import api
 from src.domain.customer.entities import Customer
 from src.domain.customer.errors import (
     CustomerIsNotFoundException,
@@ -60,7 +61,7 @@ class PasswordService(IPasswordService):
 
 @dataclass
 class TokenService(ITokenService):
-    _secret_key: str
+    _secret_key: str = api.secret_key
     _access_token_expire_minutes: int = 15
     _refresh_token_expire_days: int = 7
     _algorithm: str = "HS256"
