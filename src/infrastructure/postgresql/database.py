@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 
 class Database:
-    def __init__(self, wr_url: str, ro_url: str) -> None:
+    def __init__(self, url: str) -> None:
         self._write_and_read_async_engine = create_async_engine(
-            url=wr_url, echo=False, isolation_level="READ COMMITTED"
+            url=url, echo=False, isolation_level="READ COMMITTED"
         )
         """expire_on_commit - don't expire objects after transaction commit"""
         self._write_and_read_async_session = async_sessionmaker(
@@ -20,7 +20,7 @@ class Database:
         )
 
         self._read_only_async_engine = create_async_engine(
-            url=ro_url, echo=False, isolation_level="AUTOCOMMIT"
+            url=url, echo=False, isolation_level="AUTOCOMMIT"
         )
         """autocommit=True: Read-only session should be autocommit"""
         """autoflush=False: disable autoflush for more control"""

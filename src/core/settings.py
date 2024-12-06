@@ -9,6 +9,10 @@ class DatabaseSettings(BaseModel):
     POSTGRES_PORT: str
     POSTGRES_DB: str
 
+    @property
+    def postgres_url(self) -> str:
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
 
 class ApiSettings(BaseModel):
     """api jwt secret key"""

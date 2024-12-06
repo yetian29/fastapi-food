@@ -1,20 +1,17 @@
 from datetime import datetime
-from uuid import UUID, uuid4
 
 from sqlalchemy import String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.domain.customer.entities import Customer
-from src.infrastructure.postgresql.models.base import Base
+from src.infrastructure.postgresql.models.base import BaseOid, BaseORM
 
 
-class CustomerORM(Base):
+class CustomerORM(BaseORM, BaseOid):
     __tablename__ = "customer"
-    oid: Mapped[UUID] = mapped_column(
-        default=uuid4, nullable=False, primary_key=True, unique=True
-    )
+
     username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(String, nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False)
     access_token: Mapped[str] = mapped_column(default="", unique=True)
     refresh_token: Mapped[str] = mapped_column(default="", unique=True)
     is_active: Mapped[bool] = mapped_column(default=False)
