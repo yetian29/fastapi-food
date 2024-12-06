@@ -15,16 +15,16 @@ class DatabaseSettings(BaseModel):
 
 
 class ApiSettings(BaseModel):
-    """api jwt secret key"""
-
-    secret_key: str
+    API_SECRET_KEY: str
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(case_sensitive=True, env_file=".env")
+    model_config = SettingsConfigDict(
+        case_sensitive=True, env_file=".env", extra="ignore"
+    )
 
-    api: ApiSettings
     database: DatabaseSettings
+    api: ApiSettings
 
 
 settings = Settings()
