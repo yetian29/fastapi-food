@@ -15,12 +15,12 @@ class DatabaseSettings(BaseModel):
 
 
 class ApiSettings(BaseModel):
-    API_SECRET_KEY: str
+    SECRET_KEY: str
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        case_sensitive=True, env_file=".env", extra="ignore"
+        env_file=".env", extra="allow", env_nested_delimiter="__"
     )
 
     database: DatabaseSettings

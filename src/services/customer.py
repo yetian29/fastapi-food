@@ -61,7 +61,7 @@ class PasswordService(IPasswordService):
 
 @dataclass
 class TokenService(ITokenService):
-    _secret_key: str = api.API_SECRET_KEY
+    _secret_key: str = api.SECRET_KEY
     _access_token_expire_minutes: int = 15
     _refresh_token_expire_days: int = 7
     _algorithm: str = "HS256"
