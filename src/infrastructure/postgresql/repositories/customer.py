@@ -29,7 +29,7 @@ class ICustomerRepository(ABC):
 
 @dataclass(frozen=True)
 class PostgresCustomerRepository(ICustomerRepository):
-    database: Database = Database(settings.database.postgres_url)
+    database: Database = Database(settings.database.async_postgres_url)
 
     async def get_by_username(self, username: str) -> CustomerORM | None:
         stmt = select(CustomerORM).where(CustomerORM.username == username).limit(1)
