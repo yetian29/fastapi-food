@@ -4,7 +4,6 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from src.core.settings import settings
 from src.infrastructure.postgresql.database import Database
 from src.infrastructure.postgresql.models.customer import CustomerORM
 
@@ -29,7 +28,7 @@ class ICustomerRepository(ABC):
 
 @dataclass(frozen=True)
 class PostgresCustomerRepository(ICustomerRepository):
-    database: Database = Database(settings.database.async_postgres_url)
+    database: Database
 
     async def get_by_username(self, username: str) -> CustomerORM | None:
         stmt = select(CustomerORM).where(CustomerORM.username == username).limit(1)
