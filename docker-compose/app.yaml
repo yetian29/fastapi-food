@@ -1,0 +1,21 @@
+services:
+  main-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: main-app
+    networks:
+      - backend
+    ports: 
+      - "8000:8000"
+    command: "sh /app/web.entrypoint.sh"
+    env_file:
+      - ../.env
+    volumes:
+      - ../src/:/app/src/
+    depends_on:
+    - postgres
+
+networks:
+  backend:
+    driver: bridge

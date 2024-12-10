@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy.util.concurrency import await_only, in_greenlet
 
-from src.core.config import settings
+from src.core.config.settings import settings
 from src.infrastructure.postgresql.models.base import BaseORM
 from src.infrastructure.postgresql.models.user import *  # noqa
 
@@ -23,7 +23,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = BaseORM.medatadata
+target_metadata = BaseORM.metadata
 
 config.set_main_option("sqlalchemy.url", settings.POSTGRES_URL)
 
