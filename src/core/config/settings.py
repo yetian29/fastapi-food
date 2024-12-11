@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
-    POSTGRES_PORT: int
+    POSTGRES_PORT: str
     POSTGRES_DB: str
 
     SECRET_KEY: str = secrets.token_urlsafe(32)

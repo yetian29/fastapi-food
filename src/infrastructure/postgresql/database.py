@@ -5,9 +5,11 @@ from typing import Any
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from src.core.config.settings import settings
+
 
 class Database:
-    def __init__(self, url: str) -> None:
+    def __init__(self, url: str = settings.POSTGRES_URL) -> None:
         self._write_and_read_async_engine = create_async_engine(
             url=url, echo=False, isolation_level="READ COMMITTED"
         )

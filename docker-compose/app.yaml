@@ -12,7 +12,7 @@ services:
     env_file:
       - ../.env
     volumes:
-      - ../src/:/app/src/
+      - ..:/app
     depends_on:
     - postgres
 
