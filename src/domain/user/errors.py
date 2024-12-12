@@ -5,9 +5,14 @@ class BaseUserException(BaseDomainException):
     pass
 
 
+class UserIsNotFoundException(BaseUserException):
+    pass
+
+
 class CrendentialUserException(BaseUserException):
     pass
 
 
 class PasswordInvalidException(CrendentialUserException):
     pass
+

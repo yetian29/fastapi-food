@@ -9,7 +9,7 @@ class IPasswordService(ABC):
         pass
 
     @abstractmethod
-    def verify(self, plain_password: str, hash_password: str) -> bool:
+    def verify_password(self, plain_password: str, hash_password: str) -> bool:
         pass
 
     @abstractmethod
@@ -19,7 +19,7 @@ class IPasswordService(ABC):
 
 class ILoginService(ABC):
     @abstractmethod
-    def authenticate(self, username: str, password: str) -> bool:
+    async def authenticate(self, username: str, password: str) -> bool:
         pass
 
     @abstractmethod
