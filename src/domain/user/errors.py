@@ -15,4 +15,3 @@ class CrendentialUserException(BaseUserException):
 
 class PasswordInvalidException(CrendentialUserException):
     pass
-

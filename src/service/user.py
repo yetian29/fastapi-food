@@ -7,6 +7,8 @@ from src.domain.user.entities import User
 from src.domain.user.errors import PasswordInvalidException, UserIsNotFoundException
 from src.domain.user.services import ILoginService, IPasswordService, IUserService
 from src.helper.errors import fail
+from src.infrastructure.postgresql.models.user import UserORM
+from src.infrastructure.postgresql.repositories.user import IUserRepository
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -43,13 +45,24 @@ class PasswordService(IPasswordService):
 
 @dataclass(frozen=True)
 class UserService(IUserService):
-    repostitory: IUserRepository # type: ignore
+    repostitory: IUserRepository
 
     async def get_by_username(self, username: str) -> User:
         user = await self.repostitory.get_by_username(username)
         if not user:
             fail(UserIsNotFoundException)
         return user
+
+    async def create(self, user: User) -> User:
+        user_orm = UserORM.from_entity(user)
+        user_orm = await self.repostitory.create(user_orm)
+        return user_orm.to_entity()
+
+    async def update(self, user: User) -> User:
+        user = await self.get_by_username(user.username)
+        user_orm = UserORM.from_entity(user)
+        user_orm = await self.repostitory.update(user_orm)
+        return user_orm.to_entity()
 
 
 @dataclass(frozen=True)

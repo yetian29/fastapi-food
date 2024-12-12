@@ -35,7 +35,7 @@ class Database:
 
     @asynccontextmanager
     async def get_write_and_read_session(self) -> AsyncGenerator[AsyncSession, Any]:
-        session: AsyncSession = self._write_and_read_async_session
+        session: AsyncSession = self._write_and_read_async_session()
         try:
             yield session
         except SQLAlchemyError:
@@ -46,7 +46,7 @@ class Database:
 
     @asynccontextmanager
     async def get_read_only_session(self) -> AsyncGenerator[AsyncSession, Any]:
-        session: AsyncSession = self._read_only_async_session
+        session: AsyncSession = self._read_only_async_session()
         try:
             yield session
         except SQLAlchemyError:

@@ -4,6 +4,7 @@ services:
       context: ..
       dockerfile: Dockerfile
     container_name: main-app
+    restart: always
     networks:
       - backend
     ports: 
