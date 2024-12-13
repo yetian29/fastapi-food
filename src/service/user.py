@@ -1,8 +1,11 @@
 import re
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
+from jose import jwt
 from passlib.context import CryptContext
 
+from src.core.config.settings import settings
 from src.domain.user.entities import User
 from src.domain.user.errors import PasswordInvalidException, UserIsNotFoundException
 from src.domain.user.services import ILoginService, IPasswordService, IUserService
@@ -70,10 +73,25 @@ class LoginService(ILoginService):
     user_service: IUserService
     password_service: IPasswordService
 
-    async def authenticate(self, username: str, password: str) -> bool:
+    async def authenticate(self, username: str, password: str) -> User:
         user = await self.user_service.get_by_username(username)
         if not self.password_service.verify_password(password, user.password):
             fail(
                 PasswordInvalidException("Invalid password. The password is incorrect")
             )
-        return True
+        return user
+
+    def generate_token_and_is_active(
+        self, user: User, expires_delta: timedelta | None = None
+    ) -> str:
+        if expires_delta:
+            expire = datetime.now() + expires_delta
+        else:
+            expire = datetime.now() + timedelta(minutes=15)
+
+        data = {"sub": user.oid, "exp": expire}
+        encoded_jwt = jwt.encode(
+            data, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        )
+        user.is_active = True
+        return encoded_jwt

@@ -9,6 +9,10 @@ class UserIsNotFoundException(BaseUserException):
     pass
 
 
+class UserIsExsitedException(BaseUserException):
+    pass
+
+
 class CrendentialUserException(BaseUserException):
     pass
 

@@ -22,7 +22,7 @@ class IUserRepository(ABC):
 
 
 @dataclass(frozen=True)
-class UserRepository(IUserRepository):
+class PostgresUserRepository(IUserRepository):
     database: Database
 
     async def get_by_username(self, username: str) -> UserORM | None:
@@ -34,6 +34,7 @@ class UserRepository(IUserRepository):
         async with self.database.get_write_and_read_session() as session:
             session.add(user)
             await session.commit()
+            await session.refresh(user)
             return user
 
     async def update(self, user: UserORM) -> UserORM:
