@@ -12,7 +12,7 @@ class RegisterUserUseCase:
     user_service: IUserService
 
     async def execute(self, command: RegisterUserCommand) -> User:
-        if await self.user_service.get_by_username(username=command.user.username):
+        if await self.user_service.get_by_username_or_email(username=command.user.username, email = command.user.email):
             fail(UserIsExsitedException("The user is exsited. Please login account"))
         return await self.user_service.create(user=command.user)
 
@@ -23,6 +23,7 @@ class LoginUserUseCase:
 
     async def execute(self, command: LoginUserCommand) -> str:
         user = await self.login_service.authenticate(
+            email=command.email,
             username=command.username, password=command.password
         )
         return await self.login_service.generate_token_and_is_active(user)
