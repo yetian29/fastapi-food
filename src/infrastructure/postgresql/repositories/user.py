@@ -25,7 +25,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, oid: str) -> UserORM:
+    async def delete(self, oid: str) -> UserORM | None:
         pass
 
 
@@ -60,7 +60,7 @@ class PostgresUserRepository(IUserRepository):
             await session.refresh(user)
             return user
 
-    async def delete(self, oid: str) -> UserORM:
+    async def delete(self, oid: str) -> UserORM | None:
         user_orm = await self.get_by_oid(oid)
         stmt = delete(UserORM).where(UserORM.oid == oid).limit(1)
         async def with self.databae.get_write_and_read_session() as session:
