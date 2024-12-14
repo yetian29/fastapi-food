@@ -66,6 +66,10 @@ class UserService(IUserService):
         user_orm = await self.repository.update(user_orm)
         return user_orm.to_entity()
 
+    async def delete(self, oid: str) -> User:
+        user_orm = await self.repository.delete(oid)
+        return user_orm.to_entity()
+
 
 @dataclass(frozen=True)
 class LoginService(ILoginService):
