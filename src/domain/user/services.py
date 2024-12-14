@@ -29,7 +29,7 @@ class ILoginService(ABC):
 
 class IUserService(ABC):
     @abstractmethod
-    async def get_by_username(self, username: str) -> User:
+    async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> User:
         pass
 
     @abstractmethod
