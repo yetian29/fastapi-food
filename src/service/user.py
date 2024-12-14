@@ -48,16 +48,10 @@ class PasswordService(IPasswordService):
 
 @dataclass(frozen=True)
 class UserService(IUserService):
-    repostitory: IUserRepository
+    repository: IUserRepository
 
-    async def get_by_username(self, username: str) -> User:
-        user = await self.repository.get_by_username(username)
-        if not user:
-            fail(UserIsNotFoundException)
-        return user
-        
-    async def get_by_email(self, email: str) -> User:
-        user = await self.repository.get_by_email(email)
+    async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> User:
+        user = await self.repository.get_by_username_or_email(username, email)
         if not user:
             fail(UserIsNotFoundException)
         return user
