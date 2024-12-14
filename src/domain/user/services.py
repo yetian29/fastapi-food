@@ -43,3 +43,7 @@ class IUserService(ABC):
     @abstractmethod
     async def delete(self, oid: str) -> User:
         pass
+
+    @abstractmethod
+    async def change_password(self, username: str | None = None, email: str | None = None, old_password: str):
+        pass
