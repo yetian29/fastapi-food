@@ -56,6 +56,12 @@ class UserService(IUserService):
             fail(UserIsNotFoundException)
         return user
 
+    async def get_by_oid(self, oid: str) -> User:
+        user = await self.repository.get_by_oid(oid)
+        if not user:
+            fail(UserIsNotFoundException)
+        return user
+
     async def create(self, user: User) -> User:
         user_orm = UserORM.from_entity(user)
         user_orm = await self.repository.create(user_orm)
@@ -67,7 +73,8 @@ class UserService(IUserService):
         return user_orm.to_entity()
 
     async def delete(self, oid: str) -> User:
-        user_orm = await self.repository.delete(oid)
+        user_orm = await self.get_by_oid(oid)
+        await self.repository.delete(oid)
         return user_orm.to_entity()
 
 
