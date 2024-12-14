@@ -39,3 +39,7 @@ class IUserService(ABC):
     @abstractmethod
     async def update(self, user: User) -> User:
         pass
+
+    @abstractmethod
+    async def delete(self, oid: str) -> User:
+        pass
