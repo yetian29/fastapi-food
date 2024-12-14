@@ -13,6 +13,7 @@ from src.infrastructure.postgresql.models.base import (
 class UserORM(BaseORM):
     __tablename__ = "user"
     oid: Mapped[uuidpk]
+    email: Mapped[str] = mapped_column(nullable=False)
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[created_at]
@@ -20,11 +21,12 @@ class UserORM(BaseORM):
 
     @staticmethod
     def from_entity(entity: User) -> "UserORM":
-        return UserORM(username=entity.username, password=entity.password)
+        return UserORM(email=entity.email, username=entity.username, password=entity.password)
 
     def to_entity(self) -> User:
         return User(
             oid=self.oid,
+            email=self.email,
             username=self.username,
             password=self.password,
             created_at=self.created_at,
