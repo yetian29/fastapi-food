@@ -9,7 +9,7 @@ from src.infrastructure.postgresql.models.user import UserORM
 
 class IUserRepository(ABC):
     @abstractmethod
-    async def get_by_username(self, username: str) -> UserORM | None:
+    async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> UserORM | None:
         pass
 
     @abstractmethod
@@ -25,8 +25,10 @@ class IUserRepository(ABC):
 class PostgresUserRepository(IUserRepository):
     database: Database
 
-    async def get_by_username(self, username: str) -> UserORM | None:
-        stmt = select(UserORM).where(UserORM.username == username).limit(1)
+    async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> UserORM | None:
+        key = username if username else email
+        key_orm = UserORM.username if username else UserORM.email
+        stmt = select(UserORM).where(key_orm == key).limit(1)
         async with self.database.get_read_only_session() as session:
             return await session.scalar(stmt)
 
