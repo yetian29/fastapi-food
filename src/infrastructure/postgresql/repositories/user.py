@@ -13,11 +13,19 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_oid(self, oid: str) -> UserORM | None:
+        pass
+
+    @abstractmethod
     async def create(self, user: UserORM) -> UserORM:
         pass
 
     @abstractmethod
     async def update(self, user: UserORM) -> UserORM:
+        pass
+
+    @abstractmethod
+    async def delete(self, oid: str) -> UserORM:
         pass
 
 
@@ -32,6 +40,12 @@ class PostgresUserRepository(IUserRepository):
         async with self.database.get_read_only_session() as session:
             return await session.scalar(stmt)
 
+    async def get_by_oid(self, oid: str) -> UserORM | None:
+        stmt = select(UserORM).where(UserORM.oid == oid).limit(1)
+        async with self.database.get_read_only_session() as session:
+            return await session.scalar(stmt)
+            
+
     async def create(self, user: UserORM) -> UserORM:
         async with self.database.get_write_and_read_session() as session:
             session.add(user)
@@ -45,3 +59,11 @@ class PostgresUserRepository(IUserRepository):
             await session.commit()
             await session.refresh(user)
             return user
+
+    async def delete(self, oid: str) -> UserORM:
+        user_orm = await self.get_by_oid(oid)
+        stmt = delete(UserORM).where(UserORM.oid == oid).limit(1)
+        async def with self.databae.get_write_and_read_session() as session:
+            await session.execute(stmt)
+            await session.commit()
+        return user_orm
