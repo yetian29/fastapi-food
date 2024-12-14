@@ -19,7 +19,7 @@ class IPasswordService(ABC):
 
 class ILoginService(ABC):
     @abstractmethod
-    async def authenticate(self, username: str, password: str) -> User:
+    async def authenticate(self, email: str | None = None, username: str | None = None, password: str) -> User:
         pass
 
     @abstractmethod
