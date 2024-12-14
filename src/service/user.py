@@ -51,20 +51,26 @@ class UserService(IUserService):
     repostitory: IUserRepository
 
     async def get_by_username(self, username: str) -> User:
-        user = await self.repostitory.get_by_username(username)
+        user = await self.repository.get_by_username(username)
+        if not user:
+            fail(UserIsNotFoundException)
+        return user
+        
+    async def get_by_email(self, email: str) -> User:
+        user = await self.repository.get_by_email(email)
         if not user:
             fail(UserIsNotFoundException)
         return user
 
     async def create(self, user: User) -> User:
         user_orm = UserORM.from_entity(user)
-        user_orm = await self.repostitory.create(user_orm)
+        user_orm = await self.repository.create(user_orm)
         return user_orm.to_entity()
 
     async def update(self, user: User) -> User:
         user = await self.get_by_username(user.username)
         user_orm = UserORM.from_entity(user)
-        user_orm = await self.repostitory.update(user_orm)
+        user_orm = await self.repository.update(user_orm)
         return user_orm.to_entity()
 
 
@@ -73,8 +79,8 @@ class LoginService(ILoginService):
     user_service: IUserService
     password_service: IPasswordService
 
-    async def authenticate(self, username: str, password: str) -> User:
-        user = await self.user_service.get_by_username(username)
+    async def authenticate(self, email: str | None = None, username: str | None = None, password: str) -> User:
+        user = await self.user_service.get_by_username_or_email(username, email)
         if not self.password_service.verify_password(password, user.password):
             fail(
                 PasswordInvalidException("Invalid password. The password is incorrect")
