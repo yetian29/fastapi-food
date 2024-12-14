@@ -62,7 +62,6 @@ class UserService(IUserService):
         return user_orm.to_entity()
 
     async def update(self, user: User) -> User:
-        user = await self.get_by_username(user.username)
         user_orm = UserORM.from_entity(user)
         user_orm = await self.repository.update(user_orm)
         return user_orm.to_entity()
