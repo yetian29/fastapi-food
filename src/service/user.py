@@ -14,12 +14,15 @@ from src.infrastructure.postgresql.models.user import UserORM
 from src.infrastructure.postgresql.repositories.user import IUserRepository
 import random
 from datetime import datetime, timedelta
+import dataclass, Field
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
+@dataclass
 class CodeService(ICodeService):
-    def generate_code(self, email: str, expire_delta: timedeta | None = None) -> str:
-        cache = {}
+    cache: dict = Field(default_factory=dict)
+    
+    def generate_code(self, email: str | None = None, username: str | None = None, expire_delta: timedeta | None = None) -> str:
         code = str(random.randint(100000, 999999))
         if expire_delta:
             expire = datetime.now() + expire_delta
@@ -29,9 +32,25 @@ class CodeService(ICodeService):
             "code": code,
             "expire": expire
         }
-        cache[email] = data
+        key = username if username else email
+        self.cache[key] = data
         return code
-        
+
+    def validate_code(self, email: str | None = None, username: str | None = None, code: str) -> bool:
+        key = username if username else email
+        data = self.cache.get(key)
+        if not data:
+            fail(DataVerifyAreNotFoundException)
+        elif code != data.get("code"):
+            del self.cache[key]
+            fail(CodeIsNotMatch)
+        elif datetime.now() > data.get("expire"):
+            del self.cache[key]
+            fail(CodeHasExpiredException)
+        del self.cache[key]
+        return True
+            
+            
 class PasswordService(IPasswordService):
     def validate_password_strength(self, plain_password: str) -> bool:
         if not 8 <= len(plain_password) <= 16:
