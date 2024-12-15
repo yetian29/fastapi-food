@@ -39,5 +39,9 @@ class ChangePasswordUseCase:
 
     async def execute(self, command: ChangePasswordCommand) -> str:
         user = await self.user_service.get_by_username_email(username=command.username, email=command.emai)
-        self.password_service.verify_password(password, user.password)
+        if self.password_service.verify_password(password, user.password):
+            hash_password = self.password_service.get_hash_password(command.new_password)
+            user.password = hash_password
+            await self.user_service.update(user)
+            return command.new_password
         
