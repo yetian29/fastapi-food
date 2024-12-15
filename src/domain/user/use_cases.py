@@ -24,10 +24,11 @@ class LoginUserUseCase:
     password_service: IPasswordService
 
     async def execute(self, command: LoginUserCommand) -> str:
-        user = await self.login_service.authenticate(
-            email=command.email,
-            username=command.username, password=command.password
-        )
+        user = await self.user_service.get_by_username_or_email(command.username, command.email)
+        if not self.password_service.verify_password(command.password, user.password):
+            fail(
+                PasswordInvalidException("Invalid password. The password is incorrect")
+            )
         token = await self.login_service.generate_token_and_is_active(user)
         await self.user_service.update(user)
         return token
