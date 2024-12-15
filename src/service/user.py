@@ -119,8 +119,7 @@ class UserService(IUserService):
 
 @dataclass(frozen=True)
 class LoginService(ILoginService):
-    user_service: IUserService
-    password_service: IPasswordService
+    
 
     async def authenticate(self, email: str | None = None, username: str | None = None, password: str) -> User:
         user = await self.user_service.get_by_username_or_email(username, email)
