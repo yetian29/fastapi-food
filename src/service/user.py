@@ -87,7 +87,6 @@ class PasswordService(IPasswordService):
 @dataclass(frozen=True)
 class UserService(IUserService):
     repository: IUserRepositor
-    password_service: IPasswordService
 
     async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> User:
         user = await self.repository.get_by_username_or_email(username, email)
@@ -115,18 +114,6 @@ class UserService(IUserService):
         user_orm = await self.get_by_oid(oid)
         await self.repository.delete(oid)
         return user_orm.to_entity()
-
-    async def change_password(self, email: str | None = None,  username: str | None = None, old_password: str, new_password: str) -> str:
-        user = await self.get_by_username_or_email(username, email)
-        if self.password_service.verify_password(old_password, user.password):
-            hash_password = self.password_service.get_hash_password(new_password) 
-            user.password = hash_password
-            await self.update(user)
-            return new_password
-        fail(OldPasswordIncorrectException)
-
-    async def forget_password(self, email: str):
-        pass
         
 
 
