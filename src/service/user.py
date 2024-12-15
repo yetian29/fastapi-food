@@ -12,10 +12,26 @@ from src.domain.user.services import ILoginService, IPasswordService, IUserServi
 from src.helper.errors import fail
 from src.infrastructure.postgresql.models.user import UserORM
 from src.infrastructure.postgresql.repositories.user import IUserRepository
+import random
+from datetime import datetime, timedelta
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
-
+class CodeService(ICodeService):
+    def generate_code(self, email: str, expire_delta: timedeta | None = None) -> str:
+        cache = {}
+        code = str(random.randint(100000, 999999))
+        if expire_delta:
+            expire = datetime.now() + expire_delta
+        else:
+            expire = datetime.now() + timedelta(minutes=15)
+        data = {
+            "code": code,
+            "expire": expire
+        }
+        cache[email] = data
+        return code
+        
 class PasswordService(IPasswordService):
     def validate_password_strength(self, plain_password: str) -> bool:
         if not 8 <= len(plain_password) <= 16:
@@ -106,10 +122,10 @@ class LoginService(ILoginService):
         return user
 
     def generate_token_and_is_active(
-        self, user: User, expires_delta: timedelta | None = None
+        self, user: User, expire_delta: timedelta | None = None
     ) -> str:
-        if expires_delta:
-            expire = datetime.now() + expires_delta
+        if expire_delta:
+            expire = datetime.now() + expire_delta
         else:
             expire = datetime.now() + timedelta(minutes=15)
 
