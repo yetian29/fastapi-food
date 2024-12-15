@@ -18,3 +18,11 @@ class LoginUserCommand:
 class ForgetPasswordCommand:
     email: str
 
+@dataclass(frozen=True)
+class VerifyCodeSentToEmailForForgetPasswordCommand:
+    email: str
+    code: str
+
+@dataclass(frozen=True)
+class CreateNewPasswordCommand:
+    password: str
