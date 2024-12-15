@@ -64,5 +64,5 @@ class IUserService(ABC):
         pass
 
     @abstractmethod
-    async def forget_password(self, username: str | None = None, email: str | None  = None) -> str:
+    async def forget_password(self, email: str) -> str:
         pass
