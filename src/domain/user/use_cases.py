@@ -44,4 +44,5 @@ class ChangePasswordUseCase:
             user.password = hash_password
             await self.user_service.update(user)
             return command.new_password
-        
+        fail(OldPasswordIncorrectException)
+
