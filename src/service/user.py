@@ -118,17 +118,7 @@ class UserService(IUserService):
 
 
 @dataclass(frozen=True)
-class LoginService(ILoginService):
-    
-
-    async def authenticate(self, email: str | None = None, username: str | None = None, password: str) -> User:
-        user = await self.user_service.get_by_username_or_email(username, email)
-        if not self.password_service.verify_password(password, user.password):
-            fail(
-                PasswordInvalidException("Invalid password. The password is incorrect")
-            )
-        return user
-
+class LoginService(ILoginService):       
     def generate_token_and_is_active(
         self, user: User, expire_delta: timedelta | None = None
     ) -> str:
