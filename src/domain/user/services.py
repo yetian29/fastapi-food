@@ -2,7 +2,20 @@ from abc import ABC, abstractmethod
 
 from src.domain.user.entities import User
 
+class ICodeService(ABC):
+    @abstractmethod
+    def genarate_code(self, email: str) -> str:
+        pass
 
+    @abstractmethod
+    def validate_code(self, email: str, code: str) -> bool:
+        pass
+
+class ISendCodeService(ABC):
+    @abstractmethod
+    def send_code(self, email: str, code: str) -> None: 
+        pass
+        
 class IPasswordService(ABC):
     @abstractmethod
     def validate_password_strength(self, plain_password: str) -> bool:
