@@ -21,6 +21,7 @@ class RegisterUserUseCase:
 class LoginUserUseCase:
     login_service: ILoginService
     user_service: IUserService
+    password_service: IPasswordService
 
     async def execute(self, command: LoginUserCommand) -> str:
         user = await self.login_service.authenticate(
