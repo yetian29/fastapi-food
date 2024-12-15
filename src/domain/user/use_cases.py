@@ -20,10 +20,22 @@ class RegisterUserUseCase:
 @dataclass(frozen=True)
 class LoginUserUseCase:
     login_service: ILoginService
+    user_service: IUserService
 
     async def execute(self, command: LoginUserCommand) -> str:
         user = await self.login_service.authenticate(
             email=command.email,
             username=command.username, password=command.password
         )
-        return await self.login_service.generate_token_and_is_active(user)
+        token = await self.login_service.generate_token_and_is_active(user)
+        await self.user_service.update(user)
+        return token
+        
+
+@dataclass(frozen=True)
+class ChangePasswordUseCase:
+    password_service: IPasswordService
+    user_service: IUserService
+
+    async def execute(self, command: ChangePasswordCommand) -> str:
+        pass
