@@ -116,7 +116,7 @@ class UserService(IUserService):
         await self.repository.delete(oid)
         return user_orm.to_entity()
 
-    async def change_password(self, email: str | None = None,  username: str | None = None, old_password: str, new_password: str) -> User:
+    async def change_password(self, email: str | None = None,  username: str | None = None, old_password: str, new_password: str) -> str:
         user = await self.get_by_username_or_email(username, email)
         if self.password_service.verify_password(old_password, user.password):
             hash_password = self.password_service.get_hash_password(new_password) 
