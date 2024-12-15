@@ -50,7 +50,10 @@ class CodeService(ICodeService):
         del self.cache[key]
         return True
             
-            
+class SendCodeService:
+    def send_code(self, email: str, code: str) -> None:
+        print(f"The code <{code}> has been sent to email <{email}>")
+        
 class PasswordService(IPasswordService):
     def validate_password_strength(self, plain_password: str) -> bool:
         if not 8 <= len(plain_password) <= 16:
