@@ -38,4 +38,6 @@ class ChangePasswordUseCase:
     user_service: IUserService
 
     async def execute(self, command: ChangePasswordCommand) -> str:
-        pass
+        user = await self.user_service.get_by_username_email(username=command.username, email=command.emai)
+        self.password_service.verify_password(password, user.password)
+        
