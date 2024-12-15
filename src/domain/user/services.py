@@ -34,10 +34,6 @@ class IPasswordService(ABC):
 
 class ILoginService(ABC):
     @abstractmethod
-    async def authenticate(self, email: str | None = None, username: str | None = None, password: str) -> User:
-        pass
-
-    @abstractmethod
     def generate_token_and_is_active(self, user: User, expire_delta: timedelta | None = None) -> str:
         pass
 
@@ -59,10 +55,4 @@ class IUserService(ABC):
     async def delete(self, oid: str) -> User:
         pass
 
-    @abstractmethod
-    async def change_password(self, username: str | None = None, email: str | None = None, old_password: str) -> str:
-        pass
-
-    @abstractmethod
-    async def forget_password(self, email: str) -> str:
-        pass
+    
