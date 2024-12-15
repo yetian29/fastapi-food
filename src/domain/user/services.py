@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 
 from src.domain.user.entities import User
 
+from datetime import timedelta
+
 class ICodeService(ABC):
     @abstractmethod
-    def genarate_code(self, email: str) -> str:
+    def genarate_code(self, email: str, expire_delta: timedelta | None = None) -> str:
         pass
 
     @abstractmethod
@@ -36,7 +38,7 @@ class ILoginService(ABC):
         pass
 
     @abstractmethod
-    def generate_token_and_is_active(self, user: User) -> str:
+    def generate_token_and_is_active(self, user: User, expire_delta: timedelta | None = None) -> str:
         pass
 
 
