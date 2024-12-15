@@ -10,5 +10,11 @@ class RegisterUserCommand:
 
 @dataclass(frozen=True)
 class LoginUserCommand:
+    email: str
     username: str
     password: str
+
+@dataclass(frozen=True)
+class ForgetPasswordCommand:
+    email: str
+
