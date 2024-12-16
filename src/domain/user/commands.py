@@ -36,5 +36,5 @@ class VerifyCodeSentToEmailForForgetPasswordCommand:
 
 @dataclass(frozen=True)
 class CreateNewPasswordCommand:
-    email: str
+    user: User
     password: str
