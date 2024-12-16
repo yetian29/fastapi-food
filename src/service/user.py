@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 
 from src.core.config.settings import settings
 from src.domain.user.entities import User
-from src.domain.user.errors import PasswordInvalidException, UserIsNotFoundException
+from src.domain.user.errors import PasswordInvalidException, UserIsNotFoundException, DataVerifyAreNotFoundException, CodeIsNotMatch, CodeHasExpiredException
 from src.domain.user.services import ILoginService, IPasswordService, IUserService
 from src.helper.errors import fail
 from src.infrastructure.postgresql.models.user import UserORM
