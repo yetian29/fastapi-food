@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from src.domain.user.commands import LoginUserCommand, RegisterUserCommand
 from src.domain.user.entities import User
-from src.domain.user.errors import UserIsExsitedException
+from src.domain.user.errors import UserIsExsitedException, PasswordInValidException, OldPasswordIncorrectException
 from src.domain.user.services import ILoginService, IUserService
 from src.helper.errors import fail
 
