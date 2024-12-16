@@ -12,6 +12,8 @@ class UserIsNotFoundException(BaseUserException):
 class UserIsExsitedException(BaseUserException):
     pass
 
+class CodeException(BaseUserException):
+    pass
 
 class CrendentialUserException(BaseUserException):
     pass
@@ -22,3 +24,8 @@ class PasswordInvalidException(CrendentialUserException):
 
 class OldPasswordInCorrectException(CredentialUserException):
     pass
+
+class DataVerifyAreNotFoundException(CodeException):
+    pass
+
+
