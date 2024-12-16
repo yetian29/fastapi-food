@@ -16,8 +16,8 @@ class LoginUserCommand:
 
 @dataclass(frozen=True)
 class ChangePasswordCommand:
-    email: str
-    username: str
+    email: str | None = None
+    username: str | None = None
     current_password: str
     new_password: str
 
