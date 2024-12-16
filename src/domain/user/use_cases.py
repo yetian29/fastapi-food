@@ -65,11 +65,26 @@ class ForgetPasswordUseCase:
     code_service: ICodeService
     send_service: ISendCodeService
     user_service: IUserService
+    password_service: IPasswordService
 
-    def execute(self, command: ForgetPasswordCommand ) -> str:
+    def execute_one(self, command: ForgetPasswordCommand ) -> str:
         user = await self.user_service.get_by_username_or_email(command.email)
         code = self.code_service.generate_code(user.email)
         self.send_service.send_code(user.email, code)
         return code
+
+    def execute_two(self, command: VerifyCodeSentToEmailCommand):
+        user = await self.user_service.get_by_username_or_email(command.email)
+        return self.code_service.validate_code(user.email, command.code)
+
+    def execute_three(self, command: CreateNewPasswordCommand) -> str:
+        hash_password = self.password_service.get_hash_password(command.password)
+        user.password = hash_password
+        await self.user_service.update(user)
+        return command.password
         
+            
+            
+
+
 
