@@ -15,6 +15,12 @@ class LoginUserCommand:
     password: str
 
 @dataclass(frozen=True)
+class ChangePasswordCommand:
+    email: str
+    username: str
+    password: str
+
+@dataclass(frozen=True)
 class ForgetPasswordCommand:
     email: str
 
