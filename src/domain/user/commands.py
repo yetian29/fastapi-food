@@ -22,6 +22,10 @@ class ChangePasswordCommand:
     new_password: str
 
 @dataclass(frozen=True)
+class GetUserCommand:
+    oid: UUID
+
+@dataclass(frozen=True)
 class ForgetPasswordCommand:
     email: str
 
