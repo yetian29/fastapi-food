@@ -64,7 +64,12 @@ class ChangePasswordUseCase:
 class ForgetPasswordUseCase:
     code_service: ICodeService
     send_service: ISendCodeService
+    user_service: IUserService
 
-    def execute(self, command: ) -> str:
-        pass
+    def execute(self, command: ForgetPasswordCommand ) -> str:
+        user = await self.user_service.get_by_username_or_email(command.email)
+        code = self.code_service.generate_code(user.email)
+        self.send_service.send_code(user.email, code)
+        return code
+        
 
