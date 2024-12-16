@@ -6,7 +6,7 @@ from datetime import timedelta
 
 class ICodeService(ABC):
     @abstractmethod
-    def genarate_code(self, email: str, expire_delta: timedelta | None = None) -> str:
+    def generate_code(self, email: str, expire_delta: timedelta | None = None) -> str:
         pass
 
     @abstractmethod
