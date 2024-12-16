@@ -60,3 +60,11 @@ class ChangePasswordUseCase:
             return command.new_password
         fail(OldPasswordIncorrectException)
 
+@dataclass(frozen=True)
+class ForgetPasswordUseCase:
+    code_service: ICodeService
+    send_service: ISendCodeService
+
+    def execute(self, command: ) -> str:
+        pass
+
