@@ -25,4 +25,10 @@ class CodeException(BaseUserException):
 class DataVerifyAreNotFoundException(CodeException):
     pass
 
+class CodeIsNotMatchException(CodeException):
+    pass
+
+class CodeHasExpiredException(CodeException):
+    pass
+
 
