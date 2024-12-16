@@ -20,4 +20,5 @@ class CrendentialUserException(BaseUserException):
 class PasswordInvalidException(CrendentialUserException):
     pass
 
-class OldPasswordInCorrectException(CredentialUserException)
+class OldPasswordInCorrectException(CredentialUserException):
+    pass
