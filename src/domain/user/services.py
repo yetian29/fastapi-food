@@ -4,6 +4,11 @@ from src.domain.user.entities import User
 
 from datetime import timedelta
 
+class IAuthAvailableAreProvidedService:
+    @abstractmethod
+    def authenticate(self, token: str);
+        pass
+
 class ICodeService(ABC):
     @abstractmethod
     def generate_code(self, email: str, expire_delta: timedelta | None = None) -> str:
