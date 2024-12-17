@@ -18,6 +18,12 @@ import dataclass, Field
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
+class GoogleAuthentication(IAuthAvailableAreProvided):
+    pass
+
+class AppleAuthentication(IAuthAvailableAreProvided):
+    pass
+    
 @dataclass
 class CodeService(ICodeService):
     cache: dict = Field(default_factory=dict)
