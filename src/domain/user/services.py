@@ -49,6 +49,10 @@ class IUserService(ABC):
         pass
 
     @abstractmethod
+    async def get_all_users(self) -> list[User] | None:
+        pass
+
+    @abstractmethod
     async def create(self, user: User) -> User:
         pass
 
