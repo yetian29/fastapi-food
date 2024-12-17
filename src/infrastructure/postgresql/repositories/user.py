@@ -50,8 +50,10 @@ class PostgresUserRepository(IUserRepository):
             return await session.scalar(stmt)
 
     async def get_all_user(self):
-        pass
-            
+        stmt = select(UserORM).order_by(UserORM.oid)
+        async with self.databasr.get_read_only_session() as session:
+            await session.scalars(stmt)
+
 
     async def create(self, user: UserORM) -> UserORM:
         async with self.database.get_write_and_read_session() as session:
