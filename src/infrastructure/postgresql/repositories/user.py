@@ -17,7 +17,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_list_user(self) -> :
+    async def get_all_user(self) -> :
         pass
 
     @abstractmethod
@@ -48,6 +48,9 @@ class PostgresUserRepository(IUserRepository):
         stmt = select(UserORM).where(UserORM.oid == oid).limit(1)
         async with self.database.get_read_only_session() as session:
             return await session.scalar(stmt)
+
+    async def get_all_user(self):
+        pass
             
 
     async def create(self, user: UserORM) -> UserORM:
