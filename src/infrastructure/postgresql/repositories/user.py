@@ -17,7 +17,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_all_user(self) -> :
+    async def get_all_users(self) -> :
         pass
 
     @abstractmethod
@@ -49,9 +49,9 @@ class PostgresUserRepository(IUserRepository):
         async with self.database.get_read_only_session() as session:
             return await session.scalar(stmt)
 
-    async def get_all_user(self) -> list[UserORM]:
+    async def get_all_users(self) -> list[UserORM]:
         stmt = select(UserORM).order_by(UserORM.oid)
-        async with self.databasr.get_read_only_session() as session:
+        async with self.database.get_read_only_session() as session:
             return await session.scalars(stmt).all()
 
 
