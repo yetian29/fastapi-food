@@ -1,5 +1,5 @@
 from enum import Enum
 
-class AuthAreProvided(str, Enum):
+class AuthAvailableAreProvided(str, Enum):
   google = "google"
   apple = "apple"
