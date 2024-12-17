@@ -4,7 +4,7 @@ from src.domain.user.entities import User
 
 from datetime import timedelta
 
-class IAuthAvailableAreProvidedService:
+class IAuthAvailableAreProvidedService(ABC):
     @abstractmethod
     def authenticate(self, token: str);
         pass
