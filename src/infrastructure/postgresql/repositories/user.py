@@ -17,6 +17,10 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_list_user(self) -> :
+        pass
+
+    @abstractmethod
     async def create(self, user: UserORM) -> UserORM:
         pass
 
