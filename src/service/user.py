@@ -19,7 +19,11 @@ import dataclass, Field
 pwd_context = CryptContext(schemes=["bcrypt"])
 
 class GoogleAuthentication(IAuthAvailableAreProvided):
-    pass
+    def get_user_by_auth_provider(self, token: str):
+        headers = {
+           "Authorization": f"Bearer {token}"
+        }
+        pass
 
 class AppleAuthentication(IAuthAvailableAreProvided):
     pass
