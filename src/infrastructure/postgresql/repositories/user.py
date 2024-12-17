@@ -17,7 +17,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_all_users(self) -> :
+    async def get_all_users(self) -> list[UserORM] :
         pass
 
     @abstractmethod
