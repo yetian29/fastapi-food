@@ -43,7 +43,7 @@ class GetUserUseCase:
 class GetListUserUseCase:
     user_service: IUserService
     async def execute(self) -> list[User]:
-        return await self.user_service.get_list_user()
+        return await self.user_service.get_all_users()
 
     
 @dataclass(frozen=True)
