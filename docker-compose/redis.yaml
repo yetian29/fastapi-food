@@ -14,5 +14,7 @@ volumes:
   redis_data:
 
 networks:
-  driver:
-  backend
+  backend:
+      driver: bridge
+    
+
