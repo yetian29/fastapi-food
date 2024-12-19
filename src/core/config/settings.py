@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 3600
 
     SENDGRID_KEY: str
+    FROM_EMAIL: str
 
     @property
     def POSTGRES_URL(self) -> str:
