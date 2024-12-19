@@ -15,6 +15,8 @@ from src.infrastructure.postgresql.repositories.user import IUserRepository
 import random
 from datetime import datetime, timedelta
 import dataclass, Field
+from sendgrid.helpers.mail import Mail
+from sendgrid import SendGridAPIClient
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -37,7 +39,7 @@ class CodeService(ICodeService):
         if expire_delta:
             expire = datetime.now() + expire_delta
         else:
-            expire = datetime.now() + timedelta(minutes=15)
+            expire = datetime.now() + timedelta(minutes=5)
         data = {
             "code": code,
             "expire": expire
@@ -62,6 +64,25 @@ class CodeService(ICodeService):
             
 class SendCodeService:
     def send_code(self, email: str, code: str) -> None:
+        """Send OTP via email using SendGrid"""
+        message = Mail(
+        from_email=settings.FROM_EMAIL,
+        to_emails=email,
+        subject='Your OTP Verification Code',
+        html_content=f'''
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>OTP Verification</h2>
+                <p>Your OTP code is: <strong>{otp}</strong></p>
+                <p>This code will expire in 10 minutes.</p>
+                <p>If you didn't request this code, please ignore this email.</p>
+            </div>
+        '''
+    ) 
+        sg = SendGridAPIClient(
+            settings.SENDGRID_KEY
+        )
+        sg.send(message)
+            
         print(f"The code <{code}> has been sent to email <{email}>")
         
 class PasswordService(IPasswordService):
