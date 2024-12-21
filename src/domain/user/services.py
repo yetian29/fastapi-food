@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
+from datetime import timedelta
 
 from src.domain.user.entities import User
 
-from datetime import timedelta
 
 class IAuthAvailableAreProvidedService(ABC):
     @abstractmethod
-    def authenticate(self, token: str);
+    def authenticate(self, token: str):
         pass
+
 
 class ICodeService(ABC):
     @abstractmethod
@@ -18,11 +19,13 @@ class ICodeService(ABC):
     def validate_code(self, email: str, code: str) -> bool:
         pass
 
+
 class ISendCodeService(ABC):
     @abstractmethod
-    def send_code(self, email: str, code: str) -> None: 
+    def send_code(self, email: str, code: str) -> None:
         pass
-        
+
+
 class IPasswordService(ABC):
     @abstractmethod
     def validate_password_strength(self, plain_password: str) -> bool:
@@ -39,13 +42,17 @@ class IPasswordService(ABC):
 
 class ILoginService(ABC):
     @abstractmethod
-    def generate_token_and_is_active(self, user: User, expire_delta: timedelta | None = None) -> str:
+    def generate_token_and_is_active(
+        self, user: User, expire_delta: timedelta | None = None
+    ) -> str:
         pass
 
 
 class IUserService(ABC):
     @abstractmethod
-    async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> User:
+    async def get_by_username_or_email(
+        self, username: str | None = None, email: str | None = None
+    ) -> User:
         pass
 
     @abstractmethod
@@ -63,5 +70,3 @@ class IUserService(ABC):
     @abstractmethod
     async def delete(self, oid: str) -> User:
         pass
-
-    

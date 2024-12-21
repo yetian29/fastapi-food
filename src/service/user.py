@@ -1,40 +1,50 @@
+import random
 import re
-from dataclasses import dataclass
+from dataclasses import Field, dataclass
 from datetime import datetime, timedelta
 
 from jose import jwt
 from passlib.context import CryptContext
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 from src.core.config.settings import settings
 from src.domain.user.entities import User
-from src.domain.user.errors import PasswordInvalidException, UserIsNotFoundException, DataVerifyAreNotFoundException, CodeIsNotMatch, CodeHasExpiredException
-from src.domain.user.services import ILoginService, IPasswordService, IUserService
+from src.domain.user.errors import (
+    CodeHasExpiredException,
+    CodeIsNotMatch,
+    DataVerifyAreNotFoundException,
+    PasswordInvalidException,
+    UserIsNotFoundException,
+)
+from src.domain.user.services import (
+    IAuthAvailableAreProvidedService,
+    ICodeService,
+    ILoginService,
+    IPasswordService,
+    IUserService,
+)
 from src.helper.errors import fail
 from src.infrastructure.postgresql.models.user import UserORM
 from src.infrastructure.postgresql.repositories.user import IUserRepository
-import random
-from datetime import datetime, timedelta
-import dataclass, Field
-from sendgrid.helpers.mail import Mail
-from sendgrid import SendGridAPIClient
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
-class GoogleAuthentication(IAuthAvailableAreProvided):
+class GoogleAuthentication(IAuthAvailableAreProvidedService):
     def get_user_by_auth_provider(self, token: str):
-        headers = {
-           "Authorization": f"Bearer {token}"
-        }
+        # headers = {
+        #    "Authorization": f"Bearer {token}"
+        # }
         pass
 
-class AppleAuthentication(IAuthAvailableAreProvided):
+class AppleAuthentication(IAuthAvailableAreProvidedService):
     pass
-    
+
 @dataclass
 class CodeService(ICodeService):
     cache: dict = Field(default_factory=dict)
-    
-    def generate_code(self, email: str | None = None, username: str | None = None, expire_delta: timedeta | None = None) -> str:
+
+    def generate_code(self, email: str | None = None, username: str | None = None, expire_delta: timedelta | None = None) -> str:
         code = str(random.randint(100000, 999999))
         if expire_delta:
             expire = datetime.now() + expire_delta
@@ -48,7 +58,7 @@ class CodeService(ICodeService):
         self.cache[key] = data
         return code
 
-    def validate_code(self, email: str | None = None, username: str | None = None, code: str) -> bool:
+    def validate_code(self, code: str, email: str | None = None, username: str | None = None) -> bool:
         key = username if username else email
         data = self.cache.get(key)
         if not data:
@@ -61,7 +71,7 @@ class CodeService(ICodeService):
             fail(CodeHasExpiredException)
         del self.cache[key]
         return True
-            
+
 class SendCodeService:
     def send_code(self, email: str, code: str) -> None:
         """Send OTP via email using SendGrid"""
@@ -72,7 +82,7 @@ class SendCodeService:
         html_content=f'''
             <div style="font-family: Arial, sans-serif; padding: 20px;">
                 <h2>OTP Verification</h2>
-                <p>Your OTP code is: <strong>{otp}</strong></p>
+                <p>Your OTP code is: <strong>{code}</strong></p>
                 <p>This code will expire in 10 minutes.</p>
                 <p>If you didn't request this code, please ignore this email.</p>
             </div>
@@ -82,9 +92,9 @@ class SendCodeService:
             settings.SENDGRID_KEY
         )
         sg.send(message)
-            
+
         print(f"The code <{code}> has been sent to email <{email}>")
-        
+
 class PasswordService(IPasswordService):
     def validate_password_strength(self, plain_password: str) -> bool:
         if not 8 <= len(plain_password) <= 16:
@@ -117,7 +127,7 @@ class PasswordService(IPasswordService):
 
 @dataclass(frozen=True)
 class UserService(IUserService):
-    repository: IUserRepositor
+    repository: IUserRepository
 
     async def get_by_username_or_email(self, username: str | None = None, email: str | None = None) -> User:
         user = await self.repository.get_by_username_or_email(username, email)
@@ -145,7 +155,7 @@ class UserService(IUserService):
         user_orm = await self.get_by_oid(oid)
         await self.repository.delete(oid)
         return user_orm.to_entity()
-        
+
 
 
 @dataclass(frozen=True)

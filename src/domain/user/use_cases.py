@@ -1,9 +1,27 @@
 from dataclasses import dataclass
 
-from src.domain.user.commands import LoginUserCommand, RegisterUserCommand
+from src.domain.user.commands import (
+    ChangePasswordCommand,
+    CreateNewPasswordCommand,
+    ForgetPasswordCommand,
+    GetUserCommand,
+    LoginUserCommand,
+    RegisterUserCommand,
+    VerifyCodeSentToEmailForForgetPasswordCommand,
+)
 from src.domain.user.entities import User
-from src.domain.user.errors import UserIsExsitedException, PasswordInValidException, OldPasswordIncorrectException
-from src.domain.user.services import ILoginService, IUserService
+from src.domain.user.errors import (
+    OldPasswordIncorrectException,
+    PasswordInvalidException,
+    UserIsExsitedException,
+)
+from src.domain.user.services import (
+    ICodeService,
+    ILoginService,
+    IPasswordService,
+    ISendCodeService,
+    IUserService,
+)
 from src.helper.errors import fail
 
 
@@ -12,7 +30,9 @@ class RegisterUserUseCase:
     user_service: IUserService
 
     async def execute(self, command: RegisterUserCommand) -> User:
-        if await self.user_service.get_by_username_or_email(command.user.username, command.user.email):
+        if await self.user_service.get_by_username_or_email(
+            command.user.username, command.user.email
+        ):
             fail(UserIsExsitedException("The user is exsited. Please login account"))
         return await self.user_service.create(command.user)
 
@@ -24,7 +44,9 @@ class LoginUserUseCase:
     password_service: IPasswordService
 
     async def execute(self, command: LoginUserCommand) -> str:
-        user = await self.user_service.get_by_username_or_email(command.username, command.email)
+        user = await self.user_service.get_by_username_or_email(
+            command.username, command.email
+        )
         if not self.password_service.verify_password(command.password, user.password):
             fail(
                 PasswordInvalidException("Invalid password. The password is incorrect")
@@ -33,32 +55,43 @@ class LoginUserUseCase:
         await self.user_service.update(user)
         return token
 
+
 @dataclass(frozen=True)
-class GetUserUseCase: 
+class GetUserUseCase:
     user_service: IUserService
+
     async def execute(self, command: GetUserCommand) -> User:
         return await self.user_service.get_by_oid(command.oid)
 
-@dataclass(frozen= True)
+
+@dataclass(frozen=True)
 class GetListUserUseCase:
     user_service: IUserService
+
     async def execute(self) -> list[User] | None:
         return await self.user_service.get_all_users()
 
-    
+
 @dataclass(frozen=True)
 class ChangePasswordUseCase:
     password_service: IPasswordService
     user_service: IUserService
 
     async def execute(self, command: ChangePasswordCommand) -> str:
-        user = await self.user_service.get_by_username_email(command.username, command.emai)
-        if self.password_service.verify_password(command.current_password, user.password):
-            hash_password = self.password_service.get_hash_password(command.new_password)
+        user = await self.user_service.get_by_username_email(
+            command.username, command.emai
+        )
+        if self.password_service.verify_password(
+            command.current_password, user.password
+        ):
+            hash_password = self.password_service.get_hash_password(
+                command.new_password
+            )
             user.password = hash_password
             await self.user_service.update(user)
             return command.new_password
         fail(OldPasswordIncorrectException)
+
 
 @dataclass(frozen=True)
 class ForgetPasswordUseCase:
@@ -67,13 +100,13 @@ class ForgetPasswordUseCase:
     user_service: IUserService
     password_service: IPasswordService
 
-    def execute_one(self, command: ForgetPasswordCommand ) -> str:
+    def execute_one(self, command: ForgetPasswordCommand) -> str:
         user = await self.user_service.get_by_username_or_email(command.email)
         code = self.code_service.generate_code(user.email)
         self.send_service.send_code(user.email, code)
         return code
 
-    async def execute_two(self, command: VerifyCodeSentToEmailCommand) -> User:
+    async def execute_two(self, command: VerifyCodeSentToEmailForForgetPasswordCommand) -> User:
         user = await self.user_service.get_by_username_or_email(command.email)
         self.code_service.validate_code(command.email, command.code)
         return user
@@ -81,11 +114,5 @@ class ForgetPasswordUseCase:
     async def execute_three(self, command: CreateNewPasswordCommand) -> str:
         hash_password = self.password_service.get_hash_password(command.password)
         command.user.password = hash_password
-        await self.user_service.update(user)
+        await self.user_service.update(command.user)
         return command.password
-        
-            
-            
-
-
-

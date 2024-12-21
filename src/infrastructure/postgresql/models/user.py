@@ -21,7 +21,9 @@ class UserORM(BaseORM):
 
     @staticmethod
     def from_entity(entity: User) -> "UserORM":
-        return UserORM(email=entity.email, username=entity.username, password=entity.password)
+        return UserORM(
+            email=entity.email, username=entity.username, password=entity.password
+        )
 
     def to_entity(self) -> User:
         return User(
